@@ -12,6 +12,10 @@ import org.jetbrains.kotlin.gradle.plugin.SubpluginOption
 @AutoService(KotlinGradleSubplugin::class)
 class DataClassNoStringGradleSubplugin : KotlinGradleSubplugin<AbstractCompile> {
 
+    private val version: String by lazy {
+        this::class.java.`package`.implementationVersion
+    }
+
     override fun isApplicable(project: Project, task: AbstractCompile): Boolean =
         project.plugins.hasPlugin(DataClassNoStringPlugin::class.java)
 
@@ -37,6 +41,6 @@ class DataClassNoStringGradleSubplugin : KotlinGradleSubplugin<AbstractCompile> 
     override fun getCompilerPluginId(): String = "data-class-no-string"
 
     override fun getPluginArtifact(): SubpluginArtifact =
-        SubpluginArtifact("com.cherryperry.nostrings", "kotlin-plugin", "1.0.0")
+        SubpluginArtifact("com.cherryperry.nostrings", "kotlin-plugin", version)
 
 }

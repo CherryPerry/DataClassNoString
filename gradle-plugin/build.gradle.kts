@@ -33,3 +33,7 @@ publishing {
         }
     }
 }
+
+tasks.named("jar", org.gradle.jvm.tasks.Jar::class.java) {
+    manifest.attributes("Implementation-Version" to archiveVersion)
+}
