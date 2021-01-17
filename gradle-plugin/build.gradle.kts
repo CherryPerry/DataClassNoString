@@ -24,11 +24,11 @@ gradlePlugin {
 publishing {
     repositories {
         maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/CherryPerry/DataClassNoString")
+            name = "bintray"
+            url = uri("https://api.bintray.com/maven/cherryperry/maven/DataClassNoString/;publish=1")
             credentials {
-                username = project.findProperty("gpr.user") as String?
-                password = project.findProperty("gpr.key") as String?
+                username = project.findProperty("publish.user") as String?
+                password = project.findProperty("publish.key") as String?
             }
         }
     }
