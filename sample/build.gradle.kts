@@ -1,6 +1,7 @@
 buildscript {
     repositories.maven("https://dl.bintray.com/cherryperry/maven")
-    dependencies.classpath("com.cherryperry.nostrings:gradle-plugin:1.0.0")
+    // Use published version
+    // dependencies.classpath("com.cherryperry.nostrings:gradle-plugin:${parent?.version}")
 }
 
 plugins {
