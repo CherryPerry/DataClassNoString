@@ -1,0 +1,26 @@
+name: Publish
+
+on:
+  release:
+    types: [ created ]
+
+jobs:
+  build:
+    name: Publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: Validate Gradle Wrapper
+        uses: gradle/wrapper-validation-action@v1
+      - name: Publish
+        run: ./gradlew publish -Ppublish.user=${{ secrets.PUBLISH_USER }} -Ppublish.key=${{ secrets.PUBLISH_KEY }}
