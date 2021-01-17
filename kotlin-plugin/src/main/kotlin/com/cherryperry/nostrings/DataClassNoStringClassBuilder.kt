@@ -30,28 +30,46 @@ class DataClassNoStringClassBuilder(
         exceptions: Array<out String>?
     ): MethodVisitor {
         val original = super.newMethod(origin, access, name, desc, signature, exceptions)
-        if (name == "toString") {
-            return object : TransformationMethodVisitor(
-                delegate = original,
-                access = access,
-                name = name,
-                desc = desc,
-                signature = signature,
-                exceptions = exceptions,
-                api = Opcodes.ASM5
-            ) {
-                override fun performTransformations(methodNode: MethodNode) {
-                    methodNode.instructions.clear()
-                    generateReturnEmptyString(methodNode)
-                    methodNode.check(Opcodes.ASM5)
-                }
-            }
-        } else {
-            return original
+        return when (name) {
+            "toString" ->
+                MethodTransformer(
+                    delegate = original,
+                    access = access,
+                    name = name,
+                    desc = desc,
+                    signature = signature,
+                    exceptions = exceptions,
+                    api = Opcodes.ASM5,
+                    transformation = ::generateToString
+                )
+            "hashCode" ->
+                MethodTransformer(
+                    delegate = original,
+                    access = access,
+                    name = name,
+                    desc = desc,
+                    signature = signature,
+                    exceptions = exceptions,
+                    api = Opcodes.ASM5,
+                    transformation = ::generateHashCode
+                )
+            "equals" ->
+                MethodTransformer(
+                    delegate = original,
+                    access = access,
+                    name = name,
+                    desc = desc,
+                    signature = signature,
+                    exceptions = exceptions,
+                    api = Opcodes.ASM5,
+                    transformation = ::generateEquals
+                )
+            else ->
+                original
         }
     }
 
-    private fun generateReturnEmptyString(methodNode: MethodNode) {
+    private fun generateToString(methodNode: MethodNode) {
         /*
         Bytecode:
 
@@ -75,7 +93,58 @@ class DataClassNoStringClassBuilder(
         methodNode.maxLocals = 0
     }
 
-    private fun generateReturnSuper(methodNode: MethodNode) {
+    private fun generateEquals(methodNode: MethodNode) {
+        /*
+        Bytecode:
+
+          public equals(Ljava/lang/Object;)Z
+            // annotable parameter count: 1 (visible)
+            // annotable parameter count: 1 (invisible)
+            @Lorg/jetbrains/annotations/Nullable;() // invisible, parameter 0
+           L0
+            LINENUMBER 5 L0
+            ICONST_0
+            IRETURN
+           L1
+            LOCALVARIABLE this Lcom/cherryperry/nostrings/Sample; L0 L1 0
+            LOCALVARIABLE other Ljava/lang/Object; L0 L1 1
+            MAXSTACK = 1
+            MAXLOCALS = 2
+
+         Remove one local variable, we do not need it.
+
+         */
+        methodNode.instructions.add(InsnNode(Opcodes.ICONST_0))
+        methodNode.instructions.add(InsnNode(Opcodes.IRETURN))
+        methodNode.maxStack = 1
+        methodNode.maxLocals = 0
+    }
+
+    private fun generateHashCode(methodNode: MethodNode) {
+        /*
+        Bytecode:
+
+          public hashCode()I
+           L0
+            LINENUMBER 5 L0
+            ICONST_0
+            IRETURN
+           L1
+            LOCALVARIABLE this Lcom/cherryperry/nostrings/Sample; L0 L1 0
+            MAXSTACK = 1
+            MAXLOCALS = 1
+
+         Remove both local variables, we do not need it.
+
+         */
+        methodNode.instructions.add(InsnNode(Opcodes.ICONST_0))
+        methodNode.instructions.add(InsnNode(Opcodes.IRETURN))
+        methodNode.maxStack = 1
+        methodNode.maxLocals = 0
+    }
+
+    @Deprecated("Does not work")
+    private fun generateToStringSuper(methodNode: MethodNode) {
         /*
         Bytecode:
 
@@ -115,12 +184,31 @@ class DataClassNoStringClassBuilder(
             LocalVariableNode(
                 "this",
                 "L",
-                "dev/afanasev/sekret/sample/Admin",
+                "com/cherryperry/nostrings/Sample",
                 label0,
                 label1,
                 0
             )
         )
+    }
+
+    private class MethodTransformer(
+        delegate: MethodVisitor,
+        access: Int,
+        name: String,
+        desc: String,
+        signature: String?,
+        exceptions: Array<out String>?,
+        api: Int,
+        private val transformation: (methodNode: MethodNode) -> Unit
+    ) : TransformationMethodVisitor(delegate, access, name, desc, signature, exceptions, api) {
+
+        override fun performTransformations(methodNode: MethodNode) {
+            methodNode.instructions.clear()
+            transformation(methodNode)
+            methodNode.check(Opcodes.ASM5)
+        }
+
     }
 
 }
