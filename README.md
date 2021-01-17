@@ -4,18 +4,17 @@ TODO
 
 ## Usage
 
-Use following repository for both `buildScript` and `project` dependencies:
-
 ```groovy
+buildscript {
+    repositories {
+        maven { url 'https://dl.bintray.com/cherryperry/maven' }
+    }
+    dependencies {
+        classpath 'com.cherryperry.nostrings:gradle-plugin:VERSION'
+    }
+}
 repositories {
     maven { url 'https://dl.bintray.com/cherryperry/maven' }
 }
-```
-
-Apply plugin:
-
-```groovy
 apply plugin: 'com.cherryperry.nostrings'
 ```
-
-
