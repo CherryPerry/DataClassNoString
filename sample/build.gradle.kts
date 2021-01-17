@@ -8,7 +8,8 @@ plugins {
     application
 }
 
-apply(plugin = "com.cherryperry.nostrings")
+// Use published version
+// apply(plugin = "com.cherryperry.nostrings")
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
@@ -20,10 +21,10 @@ application {
     mainClassName = "com.cherryperry.nostrings.AppKt"
 }
 
-// Check local build during development
-/*tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+// Use local build
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions {
         freeCompilerArgs += "-Xplugin=${project(":kotlin-plugin").buildDir}/libs/kotlin-plugin-$version.jar"
     }
     dependsOn(project(":kotlin-plugin").tasks.named("jar"))
-}*/
+}
