@@ -40,6 +40,5 @@ dataClassNoString {
 Compile your app and compare the results by using [diffuse](https://github.com/JakeWharton/diffuse).
 
 You should see the difference in dex size and strings count. Current implementation replaces bodies of the methods with
-fake results (basically `return 0`)
-and does not remove them. Better implementation should replace the methods with `return super.method()` calls, so later
-they can be removed by a compiler or any optimization tool (R8, ProGuard, DexGuard).
+super method invocation and does not remove them. A compiler or any optimization tool (R8, ProGuard, DexGuard) will
+remove such calls.
