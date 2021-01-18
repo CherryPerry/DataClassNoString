@@ -7,7 +7,7 @@ plugins {
 allprojects {
 
     group = "com.cherryperry.nostrings"
-    version = "1.1.2"
+    version = "1.2.0"
 
     repositories {
         jcenter()
