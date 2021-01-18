@@ -1,9 +1,8 @@
 # DataClassNoString
 
 [![Download](https://api.bintray.com/packages/cherryperry/maven/DataClassNoString/images/download.svg)](https://bintray.com/cherryperry/maven/DataClassNoString/_latestVersion)
-[![Version](https://img.shields.io/github/v/release/CherryPerry/DataClassNoString)](https://github.com/CherryPerry/DataClassNoString/releases)
-[![Build Status](https://github.com/CherryPerry/DataClassNoString/workflows/Build/badge.svg?branch=master)](https://github.com/CherryPerry/DataClassNoString/actions)
 [![License](https://img.shields.io/badge/Licence-MIT-blue)](https://github.com/badoo/Reaktive/blob/master/LICENSE)
+[![Build Status](https://github.com/CherryPerry/DataClassNoString/workflows/Build/badge.svg?branch=master)](https://github.com/CherryPerry/DataClassNoString/actions)
 
 Kotlin compiler plugin, that clears `toString()`, `equals(any: Any)` and `hashCode()` functions from your data classes.
 
