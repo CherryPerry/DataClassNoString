@@ -16,7 +16,8 @@ import org.jetbrains.org.objectweb.asm.tree.MethodInsnNode
 import org.jetbrains.org.objectweb.asm.tree.MethodNode
 
 class DataClassNoStringClassBuilder(
-    val classBuilder: ClassBuilder
+    val classBuilder: ClassBuilder,
+    private val removeAll: Boolean
 ) : DelegatingClassBuilder() {
 
     override fun getDelegate(): ClassBuilder = classBuilder
@@ -39,28 +40,39 @@ class DataClassNoStringClassBuilder(
                     desc = desc,
                     signature = signature,
                     exceptions = exceptions,
-                    api = Opcodes.ASM5
-                ) { generateToString(it) }
+                    api = Opcodes.ASM5,
+                    transformation = ::generateToString
+                )
             "hashCode" ->
-                MethodTransformer(
-                    delegate = original,
-                    access = access,
-                    name = name,
-                    desc = desc,
-                    signature = signature,
-                    exceptions = exceptions,
-                    api = Opcodes.ASM5
-                ) { generateHashCode(it) }
+                if (removeAll) {
+                    MethodTransformer(
+                        delegate = original,
+                        access = access,
+                        name = name,
+                        desc = desc,
+                        signature = signature,
+                        exceptions = exceptions,
+                        api = Opcodes.ASM5,
+                        transformation = ::generateHashCode
+                    )
+                } else {
+                    original
+                }
             "equals" ->
-                MethodTransformer(
-                    delegate = original,
-                    access = access,
-                    name = name,
-                    desc = desc,
-                    signature = signature,
-                    exceptions = exceptions,
-                    api = Opcodes.ASM5
-                ) { generateEquals(it) }
+                if (removeAll) {
+                    MethodTransformer(
+                        delegate = original,
+                        access = access,
+                        name = name,
+                        desc = desc,
+                        signature = signature,
+                        exceptions = exceptions,
+                        api = Opcodes.ASM5,
+                        transformation = ::generateEquals
+                    )
+                } else {
+                    original
+                }
             else ->
                 original
         }

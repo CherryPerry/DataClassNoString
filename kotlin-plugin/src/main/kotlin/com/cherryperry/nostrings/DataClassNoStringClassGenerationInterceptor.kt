@@ -10,7 +10,9 @@ import org.jetbrains.kotlin.diagnostics.DiagnosticSink
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.jvm.diagnostics.JvmDeclarationOrigin
 
-class DataClassNoStringClassGenerationInterceptor : ClassBuilderInterceptorExtension {
+class DataClassNoStringClassGenerationInterceptor(
+    private val removeAll: Boolean
+) : ClassBuilderInterceptorExtension {
 
     override fun interceptClassBuilderFactory(
         interceptedFactory: ClassBuilderFactory,
@@ -22,7 +24,7 @@ class DataClassNoStringClassGenerationInterceptor : ClassBuilderInterceptorExten
             override fun newClassBuilder(origin: JvmDeclarationOrigin): ClassBuilder {
                 val classDescription = origin.descriptor as? ClassDescriptor
                 return if (classDescription?.kind == ClassKind.CLASS && classDescription.isData) {
-                    DataClassNoStringClassBuilder(interceptedFactory.newClassBuilder(origin))
+                    DataClassNoStringClassBuilder(interceptedFactory.newClassBuilder(origin), removeAll)
                 } else {
                     interceptedFactory.newClassBuilder(origin)
                 }

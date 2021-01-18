@@ -34,8 +34,9 @@ class DataClassNoStringGradleSubplugin : KotlinGradleSubplugin<AbstractCompile> 
                 ?: DataClassNoStringExtension()
 
         val enabled = SubpluginOption("enabled", extension.enabled.toString())
+        val removeAll = SubpluginOption("removeAll", extension.removeAll.toString())
 
-        return listOf(enabled)
+        return listOf(enabled, removeAll)
     }
 
     override fun getCompilerPluginId(): String = "data-class-no-string"
