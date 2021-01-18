@@ -8,11 +8,7 @@ import org.jetbrains.org.objectweb.asm.Label
 import org.jetbrains.org.objectweb.asm.MethodVisitor
 import org.jetbrains.org.objectweb.asm.Opcodes
 import org.jetbrains.org.objectweb.asm.tree.InsnNode
-import org.jetbrains.org.objectweb.asm.tree.IntInsnNode
-import org.jetbrains.org.objectweb.asm.tree.LabelNode
 import org.jetbrains.org.objectweb.asm.tree.LdcInsnNode
-import org.jetbrains.org.objectweb.asm.tree.LocalVariableNode
-import org.jetbrains.org.objectweb.asm.tree.MethodInsnNode
 import org.jetbrains.org.objectweb.asm.tree.MethodNode
 
 class DataClassNoStringClassBuilder(
@@ -41,7 +37,7 @@ class DataClassNoStringClassBuilder(
                     signature = signature,
                     exceptions = exceptions,
                     api = Opcodes.ASM5,
-                    transformation = ::generateToString
+                    transformation = ::generateSuperString
                 )
             "hashCode" ->
                 if (removeAll) {
@@ -53,7 +49,7 @@ class DataClassNoStringClassBuilder(
                         signature = signature,
                         exceptions = exceptions,
                         api = Opcodes.ASM5,
-                        transformation = ::generateHashCode
+                        transformation = ::generateSuperHashCode
                     )
                 } else {
                     original
@@ -68,7 +64,7 @@ class DataClassNoStringClassBuilder(
                         signature = signature,
                         exceptions = exceptions,
                         api = Opcodes.ASM5,
-                        transformation = ::generateEquals
+                        transformation = ::generateSuperEquals
                     )
                 } else {
                     original
@@ -78,7 +74,7 @@ class DataClassNoStringClassBuilder(
         }
     }
 
-    private fun generateToString(methodNode: MethodNode) {
+    private fun generateToString(methodNode: MethodNode, transformer: MethodVisitor) {
         /*
         Bytecode:
 
@@ -152,8 +148,7 @@ class DataClassNoStringClassBuilder(
         methodNode.maxLocals = 0
     }
 
-    @Deprecated("Does not work")
-    private fun generateToStringSuper(methodNode: MethodNode) {
+    private fun generateSuperString(methodNode: MethodNode) {
         /*
         Bytecode:
 
@@ -165,40 +160,131 @@ class DataClassNoStringClassBuilder(
             INVOKESPECIAL java/lang/Object.toString ()Ljava/lang/String;
             ARETURN
            L1
-            LOCALVARIABLE this Ldev/afanasev/sekret/sample/Admin; L0 L1 0
+            LOCALVARIABLE this Lcom/cherryperry/nostrings/Sample; L0 L1 0
             MAXSTACK = 1
             MAXLOCALS = 1
 
          */
 
-        val label0 = LabelNode(Label())
-        val label1 = LabelNode(Label())
-        methodNode.instructions.add(label0)
-        methodNode.instructions.add(IntInsnNode(Opcodes.ALOAD, 0))
-        methodNode.instructions.add(
-            MethodInsnNode(
-                Opcodes.INVOKESPECIAL,
-                "java/lang/Object",
-                "toString",
-                "()Ljava/lang/String;",
-                false
-            )
+        val label0 = Label()
+        methodNode.visitLabel(label0)
+        methodNode.visitVarInsn(Opcodes.ALOAD, 0)
+        methodNode.visitMethodInsn(
+            Opcodes.INVOKESPECIAL,
+            "java/lang/Object",
+            methodNode.name,
+            methodNode.desc,
+            false
         )
-        methodNode.instructions.add(InsnNode(Opcodes.ARETURN))
-        methodNode.instructions.add(label1)
+        methodNode.visitInsn(Opcodes.ARETURN)
+        val label1 = Label()
+        methodNode.visitLabel(label1)
+        methodNode.visitLocalVariable(
+            "this",
+            "L${classBuilder.thisName};",
+            null,
+            label0,
+            label1,
+            0
+        )
+        methodNode.visitMaxs(1, 1)
+    }
 
-        methodNode.maxStack = 1
-        methodNode.maxLocals = 0
-        methodNode.localVariables.add(
-            LocalVariableNode(
-                "this",
-                "L",
-                "com/cherryperry/nostrings/Sample",
-                label0,
-                label1,
-                0
-            )
+    private fun generateSuperHashCode(methodNode: MethodNode) {
+        /*
+        Bytecode:
+
+          public hashCode()I
+           L0
+            LINENUMBER 9 L0
+            ALOAD 0
+            INVOKESPECIAL java/lang/Object.hashCode ()I
+            IRETURN
+           L1
+            LOCALVARIABLE this Lcom/cherryperry/nostrings/Sample; L0 L1 0
+            MAXSTACK = 1
+            MAXLOCALS = 1
+
+         */
+
+        val label0 = Label()
+        methodNode.visitLabel(label0)
+        methodNode.visitVarInsn(Opcodes.ALOAD, 0)
+        methodNode.visitMethodInsn(
+            Opcodes.INVOKESPECIAL,
+            "java/lang/Object",
+            methodNode.name,
+            methodNode.desc,
+            false
         )
+        methodNode.visitInsn(Opcodes.IRETURN)
+        val label1 = Label()
+        methodNode.visitLabel(label1)
+        methodNode.visitLocalVariable(
+            "this",
+            "L${classBuilder.thisName};",
+            null,
+            label0,
+            label1,
+            0
+        )
+        methodNode.visitMaxs(1, 1)
+    }
+
+    private fun generateSuperEquals(methodNode: MethodNode) {
+        /*
+        Bytecode:
+
+          public equals(Ljava/lang/Object;)Z
+            // annotable parameter count: 1 (visible)
+            // annotable parameter count: 1 (invisible)
+            @Lorg/jetbrains/annotations/Nullable;() // invisible, parameter 0
+           L0
+            LINENUMBER 5 L0
+            ALOAD 0
+            ALOAD 1
+            INVOKESPECIAL java/lang/Object.equals (Ljava/lang/Object;)Z
+            IRETURN
+           L1
+            LOCALVARIABLE this Lcom/cherryperry/nostrings/Sample; L0 L1 0
+            LOCALVARIABLE other Ljava/lang/Object; L0 L1 1
+            MAXSTACK = 2
+            MAXLOCALS = 2
+
+         */
+
+        val label0 = Label()
+        methodNode.visitLabel(label0)
+        methodNode.visitVarInsn(Opcodes.ALOAD, 0)
+        methodNode.visitVarInsn(Opcodes.ALOAD, 1)
+        Object().hashCode()
+        methodNode.visitMethodInsn(
+            Opcodes.INVOKESPECIAL,
+            "java/lang/Object",
+            methodNode.name,
+            methodNode.desc,
+            false
+        )
+        methodNode.visitInsn(Opcodes.IRETURN)
+        val label1 = Label()
+        methodNode.visitLabel(label1)
+        methodNode.visitLocalVariable(
+            "this",
+            "L${classBuilder.thisName};",
+            null,
+            label0,
+            label1,
+            0
+        )
+        methodNode.visitLocalVariable(
+            "other",
+            "Ljava/lang/Object;",
+            null,
+            label0,
+            label1,
+            0
+        )
+        methodNode.visitMaxs(2, 2)
     }
 
     private class MethodTransformer(
