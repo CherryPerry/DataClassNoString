@@ -24,10 +24,17 @@ buildscript {
         classpath 'com.cherryperry.nostrings:gradle-plugin:VERSION'
     }
 }
+
 repositories {
     maven { url 'https://dl.bintray.com/cherryperry/maven' }
 }
+
 apply plugin: 'com.cherryperry.nostrings'
+
+dataClassNoString {
+    enabled = true / false
+    removeAll = true / false // Remove everything or toString() only
+}
 ```
 
 Compile your app and compare the results by using [diffuse](https://github.com/JakeWharton/diffuse).
