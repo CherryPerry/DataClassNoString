@@ -18,6 +18,10 @@ allprojects {
 
 subprojects {
     tasks.withType<KotlinCompile> {
-        kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8.toString()
+        kotlinOptions {
+            jvmTarget = JavaVersion.VERSION_1_8.toString()
+            apiVersion = "1.3"
+            languageVersion = "1.3"
+        }
     }
 }

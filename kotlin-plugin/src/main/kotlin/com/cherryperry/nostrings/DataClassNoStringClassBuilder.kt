@@ -39,9 +39,8 @@ class DataClassNoStringClassBuilder(
                     desc = desc,
                     signature = signature,
                     exceptions = exceptions,
-                    api = Opcodes.ASM5,
-                    transformation = ::generateToString
-                )
+                    api = Opcodes.ASM5
+                ) { generateToString(it) }
             "hashCode" ->
                 MethodTransformer(
                     delegate = original,
@@ -50,9 +49,8 @@ class DataClassNoStringClassBuilder(
                     desc = desc,
                     signature = signature,
                     exceptions = exceptions,
-                    api = Opcodes.ASM5,
-                    transformation = ::generateHashCode
-                )
+                    api = Opcodes.ASM5
+                ) { generateHashCode(it) }
             "equals" ->
                 MethodTransformer(
                     delegate = original,
@@ -61,9 +59,8 @@ class DataClassNoStringClassBuilder(
                     desc = desc,
                     signature = signature,
                     exceptions = exceptions,
-                    api = Opcodes.ASM5,
-                    transformation = ::generateEquals
-                )
+                    api = Opcodes.ASM5
+                ) { generateEquals(it) }
             else ->
                 original
         }
