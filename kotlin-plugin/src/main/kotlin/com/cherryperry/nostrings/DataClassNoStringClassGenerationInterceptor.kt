@@ -5,6 +5,7 @@ import org.jetbrains.kotlin.codegen.ClassBuilderFactory
 import org.jetbrains.kotlin.codegen.ClassBuilderMode
 import org.jetbrains.kotlin.codegen.extensions.ClassBuilderInterceptorExtension
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
+import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.diagnostics.DiagnosticSink
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.jvm.diagnostics.JvmDeclarationOrigin
@@ -19,7 +20,8 @@ class DataClassNoStringClassGenerationInterceptor : ClassBuilderInterceptorExten
         object : ClassBuilderFactory {
 
             override fun newClassBuilder(origin: JvmDeclarationOrigin): ClassBuilder {
-                return if ((origin.descriptor as? ClassDescriptor)?.isData == true) {
+                val classDescription = origin.descriptor as? ClassDescriptor
+                return if (classDescription?.kind == ClassKind.CLASS && classDescription.isData) {
                     DataClassNoStringClassBuilder(interceptedFactory.newClassBuilder(origin))
                 } else {
                     interceptedFactory.newClassBuilder(origin)
