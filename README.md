@@ -4,7 +4,7 @@
 [![License](https://img.shields.io/badge/Licence-MIT-blue)](https://github.com/badoo/Reaktive/blob/master/LICENSE)
 [![Build Status](https://github.com/CherryPerry/DataClassNoString/workflows/Build/badge.svg?branch=master)](https://github.com/CherryPerry/DataClassNoString/actions)
 
-Kotlin compiler plugin, that clears `toString()`, `equals(any: Any)` and `hashCode()` functions from your data classes.
+Kotlin compiler plugin, that removes `toString()`, `equals(any: Any)` and `hashCode()` functions from your data classes.
 
 ## Motivation
 
@@ -39,6 +39,4 @@ dataClassNoString {
 
 Compile your app and compare the results by using [diffuse](https://github.com/JakeWharton/diffuse).
 
-You should see the difference in dex size and strings count. Current implementation replaces bodies of the methods with
-super method invocation and does not remove them. A compiler or any optimization tool (R8, ProGuard, DexGuard) will
-remove such calls.
+You should see the difference in dex size, method and string count.
